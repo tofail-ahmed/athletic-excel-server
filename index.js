@@ -48,12 +48,17 @@ async function run() {
 
 
 
-            const classCollection = client.db("athleteDB").collection("classes")
+            const classCollection = client.db("athleteDB").collection("clsses")
             const userCollection = client.db("athleteDB").collection("users")
 
             app.get('/classes', async (req, res) => {
                   const result = await classCollection.find().toArray();
                   res.send(result)
+            })
+
+            app.get('/sixclasses', async (req, res) => {
+                  const topSixClass = await classCollection.find().sort({ students: -1 }).limit(6).toArray();
+                  res.send(topSixClass)
             })
 
 

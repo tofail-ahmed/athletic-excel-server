@@ -46,11 +46,11 @@ async function run() {
             await client.connect();
 
 
+//collections----------
 
-
-            const classCollection = client.db("athleteDB").collection("clsses")
+            const classCollection = client.db("athleteDB").collection("classes")
             const userCollection = client.db("athleteDB").collection("users")
-
+//classsess----------
             app.get('/classes', async (req, res) => {
                   const result = await classCollection.find().toArray();
                   res.send(result)
@@ -61,8 +61,27 @@ async function run() {
                   res.send(topSixClass)
             })
 
+            // app.post("/classes",async(req,res)=>{
+            //       const {name,image,availableSeats,price}=req.body;
+            //       const newClass={
+            //             name,
+            //             image,
+            //             availableSeats,
+            //             price
+            //       }
+            //       console.log(newClass);
+            // })
+
+            app.post('/classes', async (req, res) => {
+                  const newClass = req.body;
+                  console.log(newClass);
+                  const result = await classCollection.insertOne(newClass);
+                  res.send(result)
+            }
+            );
 
 
+//jwt------------
             app.post('/jwt', (req, res) => {
                   const user = req.body;
                   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
@@ -72,7 +91,7 @@ async function run() {
             })
 
 
-
+//users--------
             app.post('/users', async (req, res) => {
                   const user = req.body;
                   const query = { email: user.email }

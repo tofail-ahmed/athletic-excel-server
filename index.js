@@ -11,6 +11,7 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
+//verifying Json web token------------------------
 const verifyJWT = (req, res, next) => {
       const authorization = req.headers.authorization;
       if (!authorization) {
@@ -47,11 +48,13 @@ async function run() {
             await client.connect();
 
 
-            //collections----------
+            //------------------------collections----------
 
             const classCollection = client.db("athleteDB").collection("classes")
             const userCollection = client.db("athleteDB").collection("users")
-            //classsess----------
+
+
+            //-------------------------classsess---------------------//-----------------------
             app.get('/allclasses', async (req, res) => {
                   const result = await classCollection.find().toArray();
                   res.send(result)
@@ -71,7 +74,7 @@ async function run() {
 
 
 
-            //approve class----------------
+            //---------------------approve class----------------//-------------------------
             app.patch('/classes/approve/:id', async (req, res) => {
                   const id = req.params.id;
                   console.log("id from approve", id);
@@ -85,7 +88,7 @@ async function run() {
                   res.send(result);
             })
 
-                  //deny classss---------------
+                // ------------------- //deny classss---------------
             app.patch('/classes/deny/:id', async (req, res) => {
                   const id = req.params.id;
                   console.log("id from deny", id);
@@ -115,7 +118,7 @@ async function run() {
             );
 
 
-                  //jwt------------
+                  //----------------------jwt------------
             app.post('/jwt', (req, res) => {
                   const user = req.body;
                   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
@@ -125,7 +128,7 @@ async function run() {
             })
 
 
-            //users--------
+            //---------------------users--------
             app.post('/users', async (req, res) => {
                   const user = req.body;
                   const query = { email: user.email }
@@ -146,7 +149,7 @@ async function run() {
 
 
 
-            //admin------------------
+            //-------------------------admin------------------
             app.patch('/users/admin/:id', async (req, res) => {
                   const id = req.params.id;
                   console.log(id);
@@ -163,7 +166,7 @@ async function run() {
             })
 
 
-            //instructor-----------
+            //-----------------------------instructor-----------
             app.patch('/users/instructor/:id', async (req, res) => {
                   const id = req.params.id;
                   console.log(id);

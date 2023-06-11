@@ -69,6 +69,18 @@ async function run() {
                   const result = await classCollection.updateOne(filter, updateDoc);
                   res.send(result);
             })
+            app.patch('/classes/deny/:id', async (req, res) => {
+                  const id = req.params.id;
+                  console.log("id from deny", id);
+                  const filter = { _id: new ObjectId(id) };
+                  const updateDoc = {
+                        $set: {
+                              status: "denied"
+                        }
+                  };
+                  const result = await classCollection.updateOne(filter, updateDoc);
+                  res.send(result);
+            })
 
             app.get('/sixclasses', async (req, res) => {
                   const topSixClass = await classCollection.find().sort({ students: -1 }).limit(6).toArray();

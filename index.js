@@ -56,6 +56,11 @@ async function run() {
                   res.send(result)
             })
 
+            app.patch('/classes/approve/:id', async (req, res) => {
+                  const id = req.params.id;
+                  console.log("id from approve", id);
+            })
+
             app.get('/sixclasses', async (req, res) => {
                   const topSixClass = await classCollection.find().sort({ students: -1 }).limit(6).toArray();
                   res.send(topSixClass)

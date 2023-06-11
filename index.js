@@ -47,16 +47,19 @@ async function run() {
             await client.connect();
 
 
-//collections----------
+            //collections----------
 
             const classCollection = client.db("athleteDB").collection("classes")
             const userCollection = client.db("athleteDB").collection("users")
-//classsess----------
+            //classsess----------
             app.get('/classes', async (req, res) => {
                   const result = await classCollection.find().toArray();
                   res.send(result)
             })
 
+
+
+            //approve class----------------
             app.patch('/classes/approve/:id', async (req, res) => {
                   const id = req.params.id;
                   console.log("id from approve", id);
@@ -69,6 +72,8 @@ async function run() {
                   const result = await classCollection.updateOne(filter, updateDoc);
                   res.send(result);
             })
+
+                  //deny classss---------------
             app.patch('/classes/deny/:id', async (req, res) => {
                   const id = req.params.id;
                   console.log("id from deny", id);
@@ -107,7 +112,7 @@ async function run() {
             );
 
 
-//jwt------------
+                  //jwt------------
             app.post('/jwt', (req, res) => {
                   const user = req.body;
                   const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
@@ -117,7 +122,7 @@ async function run() {
             })
 
 
-//users--------
+            //users--------
             app.post('/users', async (req, res) => {
                   const user = req.body;
                   const query = { email: user.email }
@@ -136,6 +141,9 @@ async function run() {
                   res.send(result)
             })
 
+
+
+            //admin------------------
             app.patch('/users/admin/:id', async (req, res) => {
                   const id = req.params.id;
                   console.log(id);
@@ -150,6 +158,9 @@ async function run() {
                   res.send(result);
 
             })
+
+
+            //instructor-----------
             app.patch('/users/instructor/:id', async (req, res) => {
                   const id = req.params.id;
                   console.log(id);

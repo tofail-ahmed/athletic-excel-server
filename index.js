@@ -52,10 +52,15 @@ async function run() {
             const classCollection = client.db("athleteDB").collection("classes")
             const userCollection = client.db("athleteDB").collection("users")
             //classsess----------
-            app.get('/classes', async (req, res) => {
+            app.get('/allclasses', async (req, res) => {
                   const result = await classCollection.find().toArray();
                   res.send(result)
             })
+            app.get('/approvedclasses', async (req, res) => {
+                  const result = await classCollection.find({ status: "approved" }).toArray();
+                  res.send(result);
+                });
+                
 
 
 
@@ -92,16 +97,7 @@ async function run() {
                   res.send(topSixClass)
             })
 
-            // app.post("/classes",async(req,res)=>{
-            //       const {name,image,availableSeats,price}=req.body;
-            //       const newClass={
-            //             name,
-            //             image,
-            //             availableSeats,
-            //             price
-            //       }
-            //       console.log(newClass);
-            // })
+         
 
             app.post('/classes', async (req, res) => {
                   const newClass = req.body;

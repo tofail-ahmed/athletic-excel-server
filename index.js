@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+
 require('dotenv').config();
 // const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 const port = process.env.PORT || 5000;
@@ -59,6 +60,14 @@ async function run() {
             app.patch('/classes/approve/:id', async (req, res) => {
                   const id = req.params.id;
                   console.log("id from approve", id);
+                  const filter = { _id: new ObjectId(id) };
+                  const updateDoc = {
+                        $set: {
+                              status: "approved"
+                        }
+                  };
+                  const result = await classCollection.updateOne(filter, updateDoc);
+                  res.send(result);
             })
 
             app.get('/sixclasses', async (req, res) => {

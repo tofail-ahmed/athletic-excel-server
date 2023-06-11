@@ -60,7 +60,14 @@ async function run() {
                   const result = await classCollection.find({ status: "approved" }).toArray();
                   res.send(result);
                 });
-                
+
+            app.get('/classes/instructorClass/:email', async (req, res) => {
+                  const email = req.params.email;
+                  const result = await classCollection.find({ "instructor.email": email }).toArray();
+                  res.send(result);
+            });
+
+
 
 
 
@@ -93,7 +100,7 @@ async function run() {
             })
 
             app.get('/sixclasses', async (req, res) => {
-                  const topSixClass = await classCollection.find().sort({ students: -1 }).limit(6).toArray();
+                  const topSixClass = await classCollection.find({ status: "approved" }).sort({ students: -1 }).limit(6).toArray();
                   res.send(topSixClass)
             })
 

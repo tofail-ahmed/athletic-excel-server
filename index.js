@@ -52,6 +52,7 @@ async function run() {
 
             const classCollection = client.db("athleteDB").collection("classes")
             const userCollection = client.db("athleteDB").collection("users")
+            const cartCollection = client.db("athleteDB").collection("carts")
 
 
             //-------------------------classsess---------------------//-----------------------
@@ -209,6 +210,40 @@ async function run() {
                   const result = await userCollection.updateOne(filter, updateDoc);
                   res.send(result);
 
+            })
+
+            //---------------------------carts------------
+
+            app.get('/carts/:email', async (req, res) => {
+                  // const email = req.query.email;
+                  // console.log(email);
+                  // if (!email) {
+                  //       res.send([]);
+                  // }
+
+                  // const decodedEmail = req.decoded.email;
+                  // if (email !== decodedEmail) {
+                  //   return res.status(403).send({ error: true, message: 'forbidden access' })
+                  // }
+
+                  // const query = { email: email };
+                  // const result = await cartCollection.find(query).toArray();
+                  // res.send(result);
+                  const email = req.params.email;
+                  const carts = await cartCollection.find({ email }).toArray();
+                  
+                  if (carts.length === 0) {
+                    return res.status(404).send({ error: 'No carts found for the email' });
+                  }
+                  
+                  res.send(carts);
+            });
+
+
+            app.post('/carts', async (req, res) => {
+                  const item = req.body;
+                  const result = await cartCollection.insertOne(item);
+                  res.send(result);
             })
 
 

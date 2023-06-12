@@ -214,36 +214,46 @@ async function run() {
 
             //---------------------------carts------------
 
-            app.get('/carts/:email', async (req, res) => {
-                  // const email = req.query.email;
-                  // console.log(email);
-                  // if (!email) {
-                  //       res.send([]);
-                  // }
+            // app.get('/carts/:email', async (req, res) => {
 
-                  // const decodedEmail = req.decoded.email;
-                  // if (email !== decodedEmail) {
-                  //   return res.status(403).send({ error: true, message: 'forbidden access' })
-                  // }
+            //       const email = req.params.email;
+            //       const carts = await cartCollection.find({ email }).toArray();
 
-                  // const query = { email: email };
-                  // const result = await cartCollection.find(query).toArray();
-                  // res.send(result);
-                  const email = req.params.email;
-                  const carts = await cartCollection.find({ email }).toArray();
-                  
-                  if (carts.length === 0) {
-                    return res.status(404).send({ error: 'No carts found for the email' });
+            //       if (carts.length === 0) {
+            //         return res.status(404).send({ error: 'No carts found for the email' });
+            //       }
+
+            //       res.send(carts);
+            // });
+            app.get('/carts', verifyJWT, async (req, res) => {
+                  const email = req.query.email;
+                  console.log(email);
+                  if (!email) {
+                        res.send([]);
                   }
-                  
-                  res.send(carts);
-            });
+
+                  const decodedEmail = req.decoded.email;
+                  if (email !== decodedEmail) {
+                        return res.status(403).send({ error: true, message: 'forbidden access' })
+                  }
+
+                  const query = { email: email };
+                  const result = await cartCollection.find(query).toArray();
+                  res.send(result);
+            })
 
 
             app.post('/carts', async (req, res) => {
                   const item = req.body;
                   const result = await cartCollection.insertOne(item);
                   res.send(result);
+            })
+
+            app.delete('/carts/:id',async(req,res)=>{
+                  const id =req.params.id;
+                  // const query = { _id: new ObjectId(id) };
+                  const result=await cartCollection.deleteOne({_id: new ObjectId(id)});
+                  res.send(result)
             })
 
 

@@ -1,9 +1,10 @@
+require('dotenv').config();
 const express = require('express');
 const app = express();
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 
-require('dotenv').config();
 // const stripe = require("stripe")(process.env.PAYMENT_SECRET_KEY);
 const port = process.env.PORT || 5000;
 
@@ -53,6 +54,7 @@ async function run() {
             const classCollection = client.db("athleteDB").collection("classes")
             const userCollection = client.db("athleteDB").collection("users")
             const cartCollection = client.db("athleteDB").collection("carts")
+            const paymentCollection = client.db("athleteDB").collection("payments")
 
 
             //-------------------------classsess---------------------//-----------------------
@@ -254,6 +256,33 @@ async function run() {
                   // const query = { _id: new ObjectId(id) };
                   const result=await cartCollection.deleteOne({_id: new ObjectId(id)});
                   res.send(result)
+            })
+
+            //-----------------------payment----------------
+            app.post('/create-payment-intent', verifyJWT, async (req, res) => {
+                  const { price } = req.body;
+                  const amount = parseInt(price * 100);
+                  const paymentIntent = await stripe.paymentIntents.create({
+                        amount: amount,
+                        currency: 'usd',
+                        payment_method_types: ['card']
+                  });
+
+                  res.send({
+                        clientSecret: paymentIntent.client_secret
+                  })
+            })
+
+
+            // payment related api
+            app.post('/payments', verifyJWT, async (req, res) => {
+                  const payment = req.body;
+                  const insertResult = await paymentCollection.insertOne(payment);
+
+                  const query = { _id: { $in: payment.cartItems.map(id => new ObjectId(id)) } }
+                  const deleteResult = await cartCollection.deleteMany(query)
+
+                  res.send({ insertResult, deleteResult });
             })
 
 

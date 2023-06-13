@@ -58,16 +58,16 @@ async function run() {
 
 
             //-------------------------classsess---------------------//-----------------------
-            app.get('/allclasses', async (req, res) => {
+            app.get('/allclasses',verifyJWT, async (req, res) => {
                   const result = await classCollection.find().toArray();
                   res.send(result)
             })
-            app.get('/approvedclasses', async (req, res) => {
+            app.get('/approvedclasses',verifyJWT,  async (req, res) => {
                   const result = await classCollection.find({ status: "approved" }).toArray();
                   res.send(result);
                 });
 
-            app.get('/classes/instructorClass/:email', async (req, res) => {
+            app.get('/classes/instructorClass/:email',verifyJWT,  async (req, res) => {
                   const email = req.params.email;
                   const result = await classCollection.find({ "instructor.email": email }).toArray();
                   res.send(result);
@@ -105,7 +105,7 @@ async function run() {
                   res.send(result);
             })
 
-            app.get('/sixclasses', async (req, res) => {
+            app.get('/sixclasses',verifyJWT,  async (req, res) => {
                   const topSixClass = await classCollection.find({ status: "approved" }).sort({ students: -1 }).limit(6).toArray();
                   res.send(topSixClass)
             })
@@ -145,7 +145,7 @@ async function run() {
                   res.send(result);
             });
 
-            app.get('/users', async (req, res) => {
+            app.get('/users',verifyJWT, async (req, res) => {
                   const result = await userCollection.find().toArray();
                   res.send(result)
             })
@@ -167,7 +167,7 @@ async function run() {
                   res.send(result);
 
             })
-            app.get('/users/admin/:email', async (req, res) => {
+            app.get('/users/admin/:email',verifyJWT,  async (req, res) => {
                   const email = req.params.email;
 
                   // if (req.decoded.email !== email) {
@@ -185,7 +185,7 @@ async function run() {
             //-----------------------------instructor-----------
 
 
-            app.get('/users/instructor/:email', async (req, res) => {
+            app.get('/users/instructor/:email',verifyJWT,  async (req, res) => {
                   const email = req.params.email;
                   console.log(email);
                   // if (req.decoded.email !== email) {
@@ -275,16 +275,45 @@ async function run() {
 
 
             // payment related api
+            // app.post('/payments', verifyJWT, async (req, res) => {
+            //       const payment = req.body;
+            //       const insertResult = await paymentCollection.insertOne(payment);
+
+            //       const query = { _id: { $in: payment.cartItems.map(id => new ObjectId(id)) } }
+            //       const deleteResult = await cartCollection.deleteMany(query)
+
+            //       res.send({ insertResult, deleteResult });
+            // })
+
+
+
+
+
+
+
+
             app.post('/payments', verifyJWT, async (req, res) => {
                   const payment = req.body;
+                
+                  // Insert the payment information into the database
                   const insertResult = await paymentCollection.insertOne(payment);
+                
+                  // Update class information: increase student field by 1 and decrease availableSeats field by 1
+                  const updateResult = await classCollection.updateMany(
+                        { _id: { $in: payment.cartItems.map(id => new ObjectId(id)) } },
+                        { $inc: { students: 1, availableSeats: -1 } },
+                        { upsert: true }
+                      )
+                
+                  // Remove purchased classes from the cart collection
+                  const query = { _id: { $in: payment.cartItems.map(id => new ObjectId(id)) } };
+                  const deleteResult = await cartCollection.deleteMany(query);
+                
+                  res.send({ insertResult, updateResult, deleteResult });
+                });
+                
 
-                  const query = { _id: { $in: payment.cartItems.map(id => new ObjectId(id)) } }
-                  const deleteResult = await cartCollection.deleteMany(query)
-
-                  res.send({ insertResult, deleteResult });
-            })
-            app.get('/payment', async (req, res) => {
+            app.get('/payment', verifyJWT, async (req, res) => {
                   const result = await paymentCollection.find().toArray();
                   res.send(result)
             })

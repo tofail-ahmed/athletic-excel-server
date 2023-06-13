@@ -284,6 +284,18 @@ async function run() {
 
                   res.send({ insertResult, deleteResult });
             })
+            app.get('/payment', async (req, res) => {
+                  const result = await paymentCollection.find().toArray();
+                  res.send(result)
+            })
+
+            app.get('/payment/:email', async (req, res) => {
+                  const email = req.params.email;
+                  const query = { email: email };
+                  const result = await paymentCollection.find(query).toArray();
+                  res.send(result);
+
+            })
 
 
             // Send a ping to confirm a successful connection

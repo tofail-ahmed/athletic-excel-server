@@ -46,7 +46,7 @@ const client = new MongoClient(uri, {
 async function run() {
       try {
             // Connect the client to the server	(optional starting in v4.7)
-            await client.connect();
+            // await client.connect();
 
 
             //------------------------collections----------
@@ -58,16 +58,16 @@ async function run() {
 
 
             //-------------------------classsess---------------------//-----------------------
-            app.get('/allclasses',verifyJWT, async (req, res) => {
+            app.get('/allclasses', async (req, res) => {
                   const result = await classCollection.find().toArray();
                   res.send(result)
             })
-            app.get('/approvedclasses',verifyJWT,  async (req, res) => {
+            app.get('/approvedclasses', async (req, res) => {
                   const result = await classCollection.find({ status: "approved" }).toArray();
                   res.send(result);
                 });
 
-            app.get('/classes/instructorClass/:email',verifyJWT,  async (req, res) => {
+            app.get('/classes/instructorClass/:email', async (req, res) => {
                   const email = req.params.email;
                   const result = await classCollection.find({ "instructor.email": email }).toArray();
                   res.send(result);
@@ -105,7 +105,7 @@ async function run() {
                   res.send(result);
             })
 
-            app.get('/sixclasses',verifyJWT,  async (req, res) => {
+            app.get('/sixclasses', async (req, res) => {
                   const topSixClass = await classCollection.find({ status: "approved" }).sort({ students: -1 }).limit(6).toArray();
                   res.send(topSixClass)
             })
@@ -145,7 +145,7 @@ async function run() {
                   res.send(result);
             });
 
-            app.get('/users',verifyJWT, async (req, res) => {
+            app.get('/users', async (req, res) => {
                   const result = await userCollection.find().toArray();
                   res.send(result)
             })
@@ -167,7 +167,7 @@ async function run() {
                   res.send(result);
 
             })
-            app.get('/users/admin/:email',verifyJWT,  async (req, res) => {
+            app.get('/users/admin/:email', async (req, res) => {
                   const email = req.params.email;
 
                   // if (req.decoded.email !== email) {
@@ -185,7 +185,7 @@ async function run() {
             //-----------------------------instructor-----------
 
 
-            app.get('/users/instructor/:email',verifyJWT,  async (req, res) => {
+            app.get('/users/instructor/:email', async (req, res) => {
                   const email = req.params.email;
                   console.log(email);
                   // if (req.decoded.email !== email) {
@@ -259,7 +259,7 @@ async function run() {
             })
 
             //-----------------------payment----------------
-            app.post('/create-payment-intent', verifyJWT, async (req, res) => {
+            app.post('/create-payment-intent', async (req, res) => {
                   const { price } = req.body;
                   const amount = parseInt(price * 100);
                   const paymentIntent = await stripe.paymentIntents.create({
@@ -292,7 +292,7 @@ async function run() {
 
 
 
-            app.post('/payments', verifyJWT, async (req, res) => {
+            app.post('/payments', async (req, res) => {
                   const payment = req.body;
                 
                   // Insert the payment information into the database
@@ -313,7 +313,7 @@ async function run() {
                 });
                 
 
-            app.get('/payment', verifyJWT, async (req, res) => {
+            app.get('/payment', async (req, res) => {
                   const result = await paymentCollection.find().toArray();
                   res.send(result)
             })
